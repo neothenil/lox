@@ -4,6 +4,10 @@
 #include <string>
 
 namespace lox {
+extern bool hadError;
+
 void runFile(const std::string& path);
 void runPrompt();
+
+void error(int line, const std::string& message);
 }

@@ -3,6 +3,9 @@ project(lox CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(vendors/fmt)
+
 include_directories(src)
 file(GLOB sources ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(lox ${sources})
+target_link_libraries(lox fmt::fmt)

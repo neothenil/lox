@@ -2,8 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <fmt/format.h>
 
 namespace lox {
+
+bool hadError = false;
 
 void run(const std::string& source)
 {
@@ -22,6 +25,7 @@ void runFile(const std::string& path)
     std::stringstream buffer;
     buffer << input.rdbuf();
     run(buffer.str());
+    if (hadError) std::exit(65);
 }
 
 void runPrompt()
@@ -32,7 +36,20 @@ void runPrompt()
         std::getline(std::cin, line);
         if (std::cin.eof()) break;
         run(line);
+        hadError = false;
     }
+}
+
+static void report(int line, const std::string& where,
+    const std::string& message)
+{
+    fmt::println("[line {}] Error{}: {}", line, where, message);
+    hadError = true;
+}
+
+void error(int line, const std::string& message)
+{
+    report(line, "", message);
 }
 
 }
