@@ -1,4 +1,14 @@
 cmake_minimum_required(VERSION 3.31)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+set(AUTOGEN_DIR ${CMAKE_SOURCE_DIR}/src/autogen)
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/generate_ast.py .
+    WORKING_DIRECTORY ${AUTOGEN_DIR}
+    COMMAND_ERROR_IS_FATAL ANY
+)
+
 project(lox CXX)
 
 set(CMAKE_CXX_STANDARD 17)

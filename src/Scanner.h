@@ -38,10 +38,18 @@ class Token
 public:
     Token(TokenType type, const std::string& lexeme,
         const std::any& literal, int line):
-        type(type), lexeme(lexeme), literal(literal), line(line)
-    {}
+        type(type), lexeme(lexeme), literal(literal), line(line) {}
+    Token(const Token& other) { *this = other; }
+    Token& operator=(const Token& other)
+    {
+        type = other.type;
+        lexeme = other.lexeme;
+        literal = other.literal;
+        line = other.line;
+        return *this;
+    }
 
-private:
+// private:
     TokenType type;
     std::string lexeme;
     std::any literal;
@@ -66,7 +74,7 @@ public:
 
     std::vector<Token> scanTokens();
 
-private:
+// private:
     bool isAtEnd() const { return mCurrent >= mSource.length(); }
     void scanToken();
     char advance() { return mSource[mCurrent++]; }
