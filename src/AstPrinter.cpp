@@ -27,6 +27,13 @@ std::string AstPrinter::anyToString(const any* obj)
     if (const int32_t* ptr = std::any_cast<int32_t>(obj)) {
         return std::to_string(*ptr);
     }
+    if (const bool* ptr = std::any_cast<bool>(obj)) {
+        if (*ptr) return "true";
+        else return "false";
+    }
+    if (const nullptr_t* ptr = std::any_cast<nullptr_t>(obj)) {
+        return "nil";
+    }
     return std::string();
 }
 

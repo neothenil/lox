@@ -1,4 +1,6 @@
 #include "Lox.h"
+#include "Parser.h"
+#include "AstPrinter.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -12,11 +14,13 @@ void run(const std::string& source)
 {
     Scanner scanner(source);
     auto tokens = scanner.scanTokens();
+    Parser parser(std::move(tokens));
+    auto expr = parser.parse();
 
-    // For now, just print the tokens.
-    for (const auto& token : tokens) {
-        std::cout << token << std::endl;
-    }
+    // Stop if there was a syntax error.
+    if (hadError) return;
+
+    fmt::println(AstPrinter().print(expr.get()));
 }
 
 void runFile(const std::string& path)
@@ -50,6 +54,16 @@ static void report(int line, const std::string& where,
 void error(int line, const std::string& message)
 {
     report(line, "", message);
+}
+
+void error(const Token& token, const std::string& message)
+{
+    if (token.type == TokenType::TOKEN_EOF) {
+        report(token.line, " at end", message);
+    }
+    else {
+        report(token.line, " at '" + token.lexeme + "'", message);
+    }
 }
 
 }
