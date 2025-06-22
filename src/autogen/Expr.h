@@ -64,13 +64,13 @@ public:
 class Literal: public Expr
 {
 public:
-    Literal(std::unique_ptr<any> value): Expr(), value(std::move(value)) {}
+    Literal(std::unique_ptr<Token> value): Expr(), value(std::move(value)) {}
     ~Literal() override = default;
 
     any accept(ExprVisitor* visitor) override
     { return visitor->visitLiteralExpr(this); }
 
-    std::unique_ptr<any> value;
+    std::unique_ptr<Token> value;
 };
 
 class Unary: public Expr

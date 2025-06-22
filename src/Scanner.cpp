@@ -135,6 +135,19 @@ void Scanner::identifier()
     TokenType type = TokenType::IDENTIFIER;
     if (sKeywords.find(text) != sKeywords.end()) {
         type = sKeywords.at(text);
+        switch (type) {
+        case TokenType::FALSE:
+            addToken(type, false);
+            return;
+        case TokenType::TRUE:
+            addToken(type, true);
+            return;
+        case TokenType::NIL:
+            addToken(type, nullptr);
+            return;
+        default:
+            break;
+        }
     }
     addToken(type);
 }

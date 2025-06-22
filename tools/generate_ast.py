@@ -103,7 +103,7 @@ def main():
     defineAst(outputDir, "Expr", [
         "Binary   : Expr left, Token op, Expr right",
         "Grouping : Expr expression",
-        "Literal  : any value",
+        "Literal  : Token value",
         "Unary    : Token op, Expr right"
     ])
 

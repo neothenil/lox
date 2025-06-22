@@ -39,7 +39,7 @@ std::string AstPrinter::anyToString(const any* obj)
 
 any AstPrinter::visitLiteralExpr(Literal* expr)
 {
-    return anyToString(expr->value.get());
+    return anyToString(&expr->value->literal);
 }
 
 any AstPrinter::visitUnaryExpr(Unary* expr)
@@ -63,18 +63,20 @@ std::string AstPrinter::parenthesize(const std::string& name,
 void printAst(Expr* expression)
 {
     // -123
-    auto minus = std::make_unique<lox::Token>(lox::TokenType::MINUS, "-", std::any(), 1);
-    auto i123 = std::make_unique<lox::Literal>(std::make_unique<std::any>(int32_t(123)));
-    auto left = std::make_unique<lox::Unary>(std::move(minus), std::move(i123));
+    auto minus = std::make_unique<Token>(TokenType::MINUS, "-", std::any(), 1);
+    auto i123 = std::make_unique<Literal>(
+        std::make_unique<Token>(TokenType::NUMBER, "123", int32_t(123), 1));
+    auto left = std::make_unique<Unary>(std::move(minus), std::move(i123));
 
     // (45.67)
-    auto right = std::make_unique<lox::Grouping>(
-        std::make_unique<lox::Literal>(std::make_unique<std::any>(45.67)));
+    auto right = std::make_unique<Grouping>(
+        std::make_unique<Literal>(
+            std::make_unique<Token>(TokenType::NUMBER, "45.67", 45.67, 1)));
 
     // *
-    auto star = std::make_unique<lox::Token>(lox::TokenType::STAR, "*", std::any(), 1);
-    auto expr = std::make_unique<lox::Binary>(std::move(left), std::move(star), std::move(right));
-    lox::AstPrinter printer;
+    auto star = std::make_unique<Token>(TokenType::STAR, "*", std::any(), 1);
+    auto expr = std::make_unique<Binary>(std::move(left), std::move(star), std::move(right));
+    AstPrinter printer;
     fmt::println(printer.print(expr.get()));
 }
 
