@@ -1,6 +1,7 @@
 #include "Lox.h"
 #include "Parser.h"
 #include "AstPrinter.h"
+#include "Interpreter.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -9,6 +10,8 @@
 namespace lox {
 
 bool hadError = false;
+bool hadRuntimeError = false;
+std::unique_ptr<Interpreter> interpreter;
 
 void run(const std::string& source)
 {
@@ -20,7 +23,10 @@ void run(const std::string& source)
     // Stop if there was a syntax error.
     if (hadError) return;
 
-    fmt::println(AstPrinter().print(expr.get()));
+    if (interpreter.get() == nullptr) {
+        interpreter = std::make_unique<Interpreter>();
+    }
+    interpreter->interpret(expr.get());
 }
 
 void runFile(const std::string& path)
@@ -30,6 +36,7 @@ void runFile(const std::string& path)
     buffer << input.rdbuf();
     run(buffer.str());
     if (hadError) std::exit(65);
+    if (hadRuntimeError) std::exit(70);
 }
 
 void runPrompt()
@@ -64,6 +71,12 @@ void error(const Token& token, const std::string& message)
     else {
         report(token.line, " at '" + token.lexeme + "'", message);
     }
+}
+
+void runtimeError(const RuntimeError& error)
+{
+    fmt::println("{}\n[line {}]", error.what(), error.token.line);
+    hadRuntimeError = true;
 }
 
 }
