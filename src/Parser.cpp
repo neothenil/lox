@@ -78,6 +78,26 @@ void Parser::synchronize()
     }
 }
 
+std::unique_ptr<Stmt> Parser::statement()
+{
+    if (match({TokenType::PRINT})) return printStatement();
+    return expressionStatement();
+}
+
+std::unique_ptr<Stmt> Parser::printStatement()
+{
+    auto value = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after print value.");
+    return std::make_unique<Print>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::expressionStatement()
+{
+    auto expr = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after expression.");
+    return std::make_unique<Expression>(std::move(expr));
+}
+
 std::unique_ptr<Expr> Parser::expression()
 {
     return equality();
@@ -167,14 +187,13 @@ std::unique_ptr<Expr> Parser::primary()
     throw error(peek(), "Expect expression.");
 }
 
-std::unique_ptr<Expr> Parser::parse()
+std::vector<std::unique_ptr<Stmt>> Parser::parse()
 {
-    try {
-        return expression();
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!isAtEnd()) {
+        statements.push_back(statement());
     }
-    catch (const ParserError& error) {
-        return nullptr;
-    }
+    return statements;
 }
 
 }

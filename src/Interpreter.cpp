@@ -10,6 +10,11 @@ any Interpreter::evaluate(Expr* expr)
     return expr->accept(this);
 }
 
+void Interpreter::execute(Stmt* stmt)
+{
+    stmt->accept(this);
+}
+
 bool Interpreter::isTruthy(const any* obj)
 {
     if (obj == nullptr) return false;
@@ -159,11 +164,25 @@ any Interpreter::visitUnaryExpr(Unary* expr)
     return any();
 }
 
-void Interpreter::interpret(Expr* expr)
+any Interpreter::visitExpressionStmt(Expression* stmt)
+{
+    evaluate(stmt->expr.get());
+    return any();
+}
+
+any Interpreter::visitPrintStmt(Print* stmt)
+{
+    auto value = evaluate(stmt->expr.get());
+    fmt::println(stringify(value));
+    return any();
+}
+
+void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements)
 {
     try {
-        auto value = evaluate(expr);
-        fmt::println(stringify(value));
+        for (auto& statement : statements) {
+            execute(statement.get());
+        }
     }
     catch (const RuntimeError& error) {
         runtimeError(error);

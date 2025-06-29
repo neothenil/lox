@@ -1,6 +1,7 @@
 #pragma once
 
 #include "autogen/Expr.h"
+#include "autogen/Stmt.h"
 #include <stdexcept>
 
 namespace lox {
@@ -14,7 +15,7 @@ public:
     Token token;
 };
 
-class Interpreter: public ExprVisitor
+class Interpreter: public ExprVisitor, public StmtVisitor
 {
 public:
     ~Interpreter() override = default;
@@ -22,11 +23,14 @@ public:
     any visitGroupingExpr(Grouping* expr) override;
     any visitLiteralExpr(Literal* expr) override;
     any visitUnaryExpr(Unary* expr) override;
+    any visitExpressionStmt(Expression* stmt) override;
+    any visitPrintStmt(Print* stmt) override;
 
-    void interpret(Expr* expr);
+    void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 
 private:
     any evaluate(Expr* expr);
+    void execute(Stmt* stmt);
     bool isTruthy(const any* obj);
     bool isEqual(const any& a, const any& b);
     void checkNumberOperand(const Token& op, const any& operand);

@@ -18,7 +18,7 @@ void run(const std::string& source)
     Scanner scanner(source);
     auto tokens = scanner.scanTokens();
     Parser parser(std::move(tokens));
-    auto expr = parser.parse();
+    auto statements = parser.parse();
 
     // Stop if there was a syntax error.
     if (hadError) return;
@@ -26,7 +26,7 @@ void run(const std::string& source)
     if (interpreter.get() == nullptr) {
         interpreter = std::make_unique<Interpreter>();
     }
-    interpreter->interpret(expr.get());
+    interpreter->interpret(statements);
 }
 
 void runFile(const std::string& path)

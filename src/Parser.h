@@ -2,6 +2,7 @@
 
 #include "Scanner.h"
 #include "autogen/Expr.h"
+#include "autogen/Stmt.h"
 #include <stdexcept>
 
 namespace lox {
@@ -18,7 +19,7 @@ class Parser
 public:
     Parser(std::vector<Token>&& tokens): tokens(std::move(tokens)) {}
 
-    std::unique_ptr<Expr> parse();
+    std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
     // utility functions
@@ -34,6 +35,10 @@ private:
     Token consume(TokenType type, const std::string& message);
 
     /* parse functions for grammar:
+     * program        → statement* EOF ;
+     * statement      → exprStmt | printStmt ;
+     * exprStmt       → expression ";" ;
+     * printStmt      → "print" expression ";" ;
      * expression     → equality ;
      * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
      * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -44,6 +49,9 @@ private:
      * primary        → NUMBER | STRING | "true" | "false" | "nil"
      *                | "(" expression ")" ;
      * */
+    std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> printStatement();
+    std::unique_ptr<Stmt> expressionStatement();
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();

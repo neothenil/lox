@@ -37,14 +37,14 @@ public:
 
 """
 FORWARD_TEMPLATE = "class {name};\n"
+INCLUDE_TEMPLATE = "#include \"{header}\"\n"
 HEADER_TEMPLATE = """#pragma once
 
 #include <memory>
 #include <vector>
 #include <any>
 
-#include "Scanner.h"
-
+{includes}
 namespace lox {{
 
 using any = std::any;
@@ -75,7 +75,8 @@ def defineType(className: str, baseName: str,
                                fields=fieldLines)
 
 
-def defineAst(outputDir: Path, baseName: str, types: list[str]):
+def defineAst(outputDir: Path, baseName: str, types: list[str],
+              includes: list[str] | None = None):
     header = outputDir / (baseName + ".h")
     baseclass = BASE_TEMPLATE.format(base=baseName)
     subclasses = ""
@@ -90,8 +91,13 @@ def defineAst(outputDir: Path, baseName: str, types: list[str]):
         visitFuncs += VISIT_FUNC_TEMPLATE.format(
             base=baseName, sub=className, lowerBase=baseName.lower())
     visitor = VISITOR_TEMPLATE.format(baseName=baseName, functions=visitFuncs)
-    text = HEADER_TEMPLATE.format(forwards=forwards, visitor=visitor,
-                                  baseclass=baseclass, subclasses=subclasses)
+    includeLines = ""
+    if includes:
+        includeLines = "".join(
+            map(lambda x: INCLUDE_TEMPLATE.format(header=x),includes))
+    text = HEADER_TEMPLATE.format(includes=includeLines, forwards=forwards, 
+                                  visitor=visitor, baseclass=baseclass,
+                                  subclasses=subclasses)
     header.write_text(text, encoding="utf-8")
 
 
@@ -105,7 +111,11 @@ def main():
         "Grouping : Expr expression",
         "Literal  : Token value",
         "Unary    : Token op, Expr right"
-    ])
+    ], ["Scanner.h"])
+    defineAst(outputDir, "Stmt", [
+        "Expression : Expr expr",
+        "Print      : Expr expr"
+    ], ["autogen/Expr.h"])
 
 
 if __name__ == "__main__":
