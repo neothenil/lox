@@ -13,6 +13,7 @@ using any = std::any;
 class Stmt;
 class Expression;
 class Print;
+class VarStmt;
 
 class StmtVisitor
 {
@@ -21,6 +22,7 @@ public:
 
     virtual any visitExpressionStmt(Expression* stmt) = 0;
     virtual any visitPrintStmt(Print* stmt) = 0;
+    virtual any visitVarStmtStmt(VarStmt* stmt) = 0;
 };
 
 class Stmt
@@ -53,6 +55,19 @@ public:
     { return visitor->visitPrintStmt(this); }
 
     std::unique_ptr<Expr> expr;
+};
+
+class VarStmt: public Stmt
+{
+public:
+    VarStmt(std::unique_ptr<Token> name, std::unique_ptr<Expr> initializer): Stmt(), name(std::move(name)), initializer(std::move(initializer)) {}
+    ~VarStmt() override = default;
+
+    any accept(StmtVisitor* visitor) override
+    { return visitor->visitVarStmtStmt(this); }
+
+    std::unique_ptr<Token> name;
+    std::unique_ptr<Expr> initializer;
 };
 
 }

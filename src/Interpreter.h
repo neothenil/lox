@@ -2,6 +2,7 @@
 
 #include "autogen/Expr.h"
 #include "autogen/Stmt.h"
+#include "Environment.h"
 #include <stdexcept>
 
 namespace lox {
@@ -18,13 +19,19 @@ public:
 class Interpreter: public ExprVisitor, public StmtVisitor
 {
 public:
+    Interpreter() = default;
     ~Interpreter() override = default;
+
+    any visitAssignExpr(Assign* expr) override;
     any visitBinaryExpr(Binary* expr) override;
     any visitGroupingExpr(Grouping* expr) override;
     any visitLiteralExpr(Literal* expr) override;
     any visitUnaryExpr(Unary* expr) override;
+    any visitVarExprExpr(VarExpr* expr) override;
+
     any visitExpressionStmt(Expression* stmt) override;
     any visitPrintStmt(Print* stmt) override;
+    any visitVarStmtStmt(VarStmt* stmt) override;
 
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 
@@ -37,6 +44,8 @@ private:
     void checkNumberOperands(const Token& op,
         const any& left, const any& right);
     std::string stringify(const any& obj);
+
+    Environment environment;
 };
 
 }

@@ -107,14 +107,17 @@ def main():
         sys.exit(64)
     outputDir = Path(sys.argv[1])
     defineAst(outputDir, "Expr", [
+        "Assign   : Token name, Expr value",
         "Binary   : Expr left, Token op, Expr right",
         "Grouping : Expr expression",
         "Literal  : Token value",
-        "Unary    : Token op, Expr right"
+        "Unary    : Token op, Expr right",
+        "VarExpr  : Token name"
     ], ["Scanner.h"])
     defineAst(outputDir, "Stmt", [
         "Expression : Expr expr",
-        "Print      : Expr expr"
+        "Print      : Expr expr",
+        "VarStmt    : Token name, Expr initializer"
     ], ["autogen/Expr.h"])
 
 

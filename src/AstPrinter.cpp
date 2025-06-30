@@ -76,8 +76,8 @@ void printAst(Expr* expression)
     // *
     auto star = std::make_unique<Token>(TokenType::STAR, "*", std::any(), 1);
     auto expr = std::make_unique<Binary>(std::move(left), std::move(star), std::move(right));
-    AstPrinter printer;
-    fmt::println(printer.print(expr.get()));
+    // AstPrinter printer;
+    // fmt::println(printer.print(expr.get()));
 }
 
 }

@@ -87,6 +87,13 @@ std::string Interpreter::stringify(const any& obj)
     return std::string();
 }
 
+any Interpreter::visitAssignExpr(Assign* expr)
+{
+    auto value = evaluate(expr->value.get());
+    environment.assign(*expr->name, value);
+    return value;
+}
+
 any Interpreter::visitBinaryExpr(Binary* expr)
 {
     auto left = evaluate(expr->left.get());
@@ -164,6 +171,11 @@ any Interpreter::visitUnaryExpr(Unary* expr)
     return any();
 }
 
+any Interpreter::visitVarExprExpr(VarExpr* expr)
+{
+    return environment.get(*expr->name);
+}
+
 any Interpreter::visitExpressionStmt(Expression* stmt)
 {
     evaluate(stmt->expr.get());
@@ -174,6 +186,17 @@ any Interpreter::visitPrintStmt(Print* stmt)
 {
     auto value = evaluate(stmt->expr.get());
     fmt::println(stringify(value));
+    return any();
+}
+
+any Interpreter::visitVarStmtStmt(VarStmt* stmt)
+{
+    any value(nullptr);
+    if (stmt->initializer != nullptr) {
+        value = evaluate(stmt->initializer.get());
+    }
+
+    environment.define(stmt->name->lexeme, value);
     return any();
 }
 
