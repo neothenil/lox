@@ -15,6 +15,18 @@ void Interpreter::execute(Stmt* stmt)
     stmt->accept(this);
 }
 
+void Interpreter::executeBlock(vector<unique_ptr<Stmt>>* statements)
+{
+    assert(statements != nullptr);
+
+    environment = std::make_unique<Environment>(std::move(environment));
+    // make sure environment will be recovered even when exception is raised.
+    EnvironmentGuard guard(environment);
+    for (auto& statement : *statements) {
+        execute(statement.get());
+    }
+}
+
 bool Interpreter::isTruthy(const any* obj)
 {
     if (obj == nullptr) return false;
@@ -90,7 +102,7 @@ std::string Interpreter::stringify(const any& obj)
 any Interpreter::visitAssignExpr(Assign* expr)
 {
     auto value = evaluate(expr->value.get());
-    environment.assign(*expr->name, value);
+    environment->assign(*expr->name, value);
     return value;
 }
 
@@ -173,7 +185,13 @@ any Interpreter::visitUnaryExpr(Unary* expr)
 
 any Interpreter::visitVarExprExpr(VarExpr* expr)
 {
-    return environment.get(*expr->name);
+    return environment->get(*expr->name);
+}
+
+any Interpreter::visitBlockStmt(Block* stmt)
+{
+    executeBlock(stmt->statements.get());
+    return any();
 }
 
 any Interpreter::visitExpressionStmt(Expression* stmt)
@@ -196,7 +214,7 @@ any Interpreter::visitVarStmtStmt(VarStmt* stmt)
         value = evaluate(stmt->initializer.get());
     }
 
-    environment.define(stmt->name->lexeme, value);
+    environment->define(stmt->name->lexeme, value);
     return any();
 }
 

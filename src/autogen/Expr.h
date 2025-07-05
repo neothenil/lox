@@ -8,7 +8,9 @@
 
 namespace lox {
 
-using any = std::any;
+using std::any;
+using std::vector;
+using std::unique_ptr;
 
 class Expr;
 class Assign;

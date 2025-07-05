@@ -8,9 +8,12 @@
 
 namespace lox {
 
-using any = std::any;
+using std::any;
+using std::vector;
+using std::unique_ptr;
 
 class Stmt;
+class Block;
 class Expression;
 class Print;
 class VarStmt;
@@ -20,6 +23,7 @@ class StmtVisitor
 public:
     virtual ~StmtVisitor() = default;
 
+    virtual any visitBlockStmt(Block* stmt) = 0;
     virtual any visitExpressionStmt(Expression* stmt) = 0;
     virtual any visitPrintStmt(Print* stmt) = 0;
     virtual any visitVarStmtStmt(VarStmt* stmt) = 0;
@@ -31,6 +35,18 @@ public:
     virtual ~Stmt() = default;
 
     virtual any accept(StmtVisitor* visitor) = 0;
+};
+
+class Block: public Stmt
+{
+public:
+    Block(std::unique_ptr<vector<unique_ptr<Stmt>>> statements): Stmt(), statements(std::move(statements)) {}
+    ~Block() override = default;
+
+    any accept(StmtVisitor* visitor) override
+    { return visitor->visitBlockStmt(this); }
+
+    std::unique_ptr<vector<unique_ptr<Stmt>>> statements;
 };
 
 class Expression: public Stmt

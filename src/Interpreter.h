@@ -19,7 +19,7 @@ public:
 class Interpreter: public ExprVisitor, public StmtVisitor
 {
 public:
-    Interpreter() = default;
+    Interpreter(): environment(std::make_unique<Environment>()) {}
     ~Interpreter() override = default;
 
     any visitAssignExpr(Assign* expr) override;
@@ -29,6 +29,7 @@ public:
     any visitUnaryExpr(Unary* expr) override;
     any visitVarExprExpr(VarExpr* expr) override;
 
+    any visitBlockStmt(Block* stmt) override;
     any visitExpressionStmt(Expression* stmt) override;
     any visitPrintStmt(Print* stmt) override;
     any visitVarStmtStmt(VarStmt* stmt) override;
@@ -38,6 +39,7 @@ public:
 private:
     any evaluate(Expr* expr);
     void execute(Stmt* stmt);
+    void executeBlock(vector<unique_ptr<Stmt>>* statements);
     bool isTruthy(const any* obj);
     bool isEqual(const any& a, const any& b);
     void checkNumberOperand(const Token& op, const any& operand);
@@ -45,7 +47,7 @@ private:
         const any& left, const any& right);
     std::string stringify(const any& obj);
 
-    Environment environment;
+    std::unique_ptr<Environment> environment;
 };
 
 }

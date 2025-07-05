@@ -15,6 +15,8 @@ std::any& Environment::get(const Token& name)
         return values.at(name.lexeme);
     }
 
+    if (enclosing != nullptr) return enclosing->get(name);
+
     throw RuntimeError(name,
         fmt::format("Undefined variable '{}'.", name.lexeme));
 }
@@ -26,8 +28,18 @@ void Environment::assign(const Token& name, const std::any& value)
         return;
     }
 
+    if (enclosing != nullptr) {
+        enclosing->assign(name, value);
+        return;
+    }
+
     throw RuntimeError(name,
         fmt::format("Undefined variable '{}'.", name.lexeme));
+}
+
+std::unique_ptr<Environment> Environment::pop()
+{
+    return std::move(enclosing);
 }
 
 }

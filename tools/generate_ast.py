@@ -47,7 +47,9 @@ HEADER_TEMPLATE = """#pragma once
 {includes}
 namespace lox {{
 
-using any = std::any;
+using std::any;
+using std::vector;
+using std::unique_ptr;
 
 {forwards}
 {visitor}
@@ -115,6 +117,7 @@ def main():
         "VarExpr  : Token name"
     ], ["Scanner.h"])
     defineAst(outputDir, "Stmt", [
+        "Block      : vector<unique_ptr<Stmt>> statements",
         "Expression : Expr expr",
         "Print      : Expr expr",
         "VarStmt    : Token name, Expr initializer"
