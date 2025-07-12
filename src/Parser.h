@@ -40,14 +40,19 @@ private:
      *                | statement ;
      * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
      * statement      → exprStmt
+     *                | ifStmt
      *                | printStmt
      *                | block;
      * exprStmt       → expression ";" ;
+     * ifStmt         → "if" "(" expression ")" statement
+     *                ( "else" statement )? ;
      * printStmt      → "print" expression ";" ;
      * block          → "{" declaration* "}" ;
      * expression     → assignment ;
      * assignment     → IDENTIFIER "=" assignment
-     *                | equality ;
+     *                | logical_or ;
+     * logic_or       → logic_and ( "or" logic_and )* ;
+     * logic_and      → equality ( "and" equality )* ;
      * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
      * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
      * term           → factor ( ( "-" | "+" ) factor )* ;
@@ -60,11 +65,14 @@ private:
     std::unique_ptr<Stmt> declaration();
     std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> ifStatement();
     std::unique_ptr<Stmt> printStatement();
     std::unique_ptr<vector<unique_ptr<Stmt>>> block();
     std::unique_ptr<Stmt> expressionStatement();
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> assignment();
+    std::unique_ptr<Expr> logicOr();
+    std::unique_ptr<Expr> logicAnd();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> term();

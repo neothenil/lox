@@ -15,6 +15,7 @@ using std::unique_ptr;
 class Stmt;
 class Block;
 class Expression;
+class If;
 class Print;
 class VarStmt;
 
@@ -25,6 +26,7 @@ public:
 
     virtual any visitBlockStmt(Block* stmt) = 0;
     virtual any visitExpressionStmt(Expression* stmt) = 0;
+    virtual any visitIfStmt(If* stmt) = 0;
     virtual any visitPrintStmt(Print* stmt) = 0;
     virtual any visitVarStmtStmt(VarStmt* stmt) = 0;
 };
@@ -59,6 +61,20 @@ public:
     { return visitor->visitExpressionStmt(this); }
 
     std::unique_ptr<Expr> expr;
+};
+
+class If: public Stmt
+{
+public:
+    If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch): Stmt(), condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {}
+    ~If() override = default;
+
+    any accept(StmtVisitor* visitor) override
+    { return visitor->visitIfStmt(this); }
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> thenBranch;
+    std::unique_ptr<Stmt> elseBranch;
 };
 
 class Print: public Stmt

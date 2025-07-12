@@ -26,11 +26,13 @@ public:
     any visitBinaryExpr(Binary* expr) override;
     any visitGroupingExpr(Grouping* expr) override;
     any visitLiteralExpr(Literal* expr) override;
+    any visitLogicalExpr(Logical* expr) override;
     any visitUnaryExpr(Unary* expr) override;
     any visitVarExprExpr(VarExpr* expr) override;
 
     any visitBlockStmt(Block* stmt) override;
     any visitExpressionStmt(Expression* stmt) override;
+    any visitIfStmt(If* stmt) override;
     any visitPrintStmt(Print* stmt) override;
     any visitVarStmtStmt(VarStmt* stmt) override;
 

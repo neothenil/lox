@@ -113,12 +113,14 @@ def main():
         "Binary   : Expr left, Token op, Expr right",
         "Grouping : Expr expression",
         "Literal  : Token value",
+        "Logical  : Expr left, Token op, Expr right",
         "Unary    : Token op, Expr right",
         "VarExpr  : Token name"
     ], ["Scanner.h"])
     defineAst(outputDir, "Stmt", [
         "Block      : vector<unique_ptr<Stmt>> statements",
         "Expression : Expr expr",
+        "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "Print      : Expr expr",
         "VarStmt    : Token name, Expr initializer"
     ], ["autogen/Expr.h"])

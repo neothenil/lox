@@ -166,6 +166,20 @@ any Interpreter::visitLiteralExpr(Literal* expr)
     return expr->value->literal;
 }
 
+any Interpreter::visitLogicalExpr(Logical* expr)
+{
+    auto left = evaluate(expr->left.get());
+
+    if (expr->op->type == TokenType::OR) {
+        if (isTruthy(&left)) return left;
+    }
+    else {
+        if (!isTruthy(&left)) return left;
+    }
+
+    return evaluate(expr->right.get());
+}
+
 any Interpreter::visitUnaryExpr(Unary* expr)
 {
     auto right = evaluate(expr->right.get());
@@ -197,6 +211,18 @@ any Interpreter::visitBlockStmt(Block* stmt)
 any Interpreter::visitExpressionStmt(Expression* stmt)
 {
     evaluate(stmt->expr.get());
+    return any();
+}
+
+any Interpreter::visitIfStmt(If* stmt)
+{
+    auto predict = evaluate(stmt->condition.get());
+    if (isTruthy(&predict)) {
+        execute(stmt->thenBranch.get());
+    }
+    else if (stmt->elseBranch != nullptr) {
+        execute(stmt->elseBranch.get());
+    }
     return any();
 }
 
