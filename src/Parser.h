@@ -42,11 +42,13 @@ private:
      * statement      → exprStmt
      *                | ifStmt
      *                | printStmt
+     *                | whileStmt
      *                | block;
      * exprStmt       → expression ";" ;
      * ifStmt         → "if" "(" expression ")" statement
      *                ( "else" statement )? ;
      * printStmt      → "print" expression ";" ;
+     * whileStmt      → "while" "(" expression ")" statement ;
      * block          → "{" declaration* "}" ;
      * expression     → assignment ;
      * assignment     → IDENTIFIER "=" assignment
@@ -67,6 +69,7 @@ private:
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> ifStatement();
     std::unique_ptr<Stmt> printStatement();
+    std::unique_ptr<Stmt> whileStatement();
     std::unique_ptr<vector<unique_ptr<Stmt>>> block();
     std::unique_ptr<Stmt> expressionStatement();
     std::unique_ptr<Expr> expression();

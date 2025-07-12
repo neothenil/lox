@@ -35,6 +35,7 @@ public:
     any visitIfStmt(If* stmt) override;
     any visitPrintStmt(Print* stmt) override;
     any visitVarStmtStmt(VarStmt* stmt) override;
+    any visitWhileStmt(While* stmt) override;
 
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 

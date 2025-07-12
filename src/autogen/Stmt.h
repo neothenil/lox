@@ -18,6 +18,7 @@ class Expression;
 class If;
 class Print;
 class VarStmt;
+class While;
 
 class StmtVisitor
 {
@@ -29,6 +30,7 @@ public:
     virtual any visitIfStmt(If* stmt) = 0;
     virtual any visitPrintStmt(Print* stmt) = 0;
     virtual any visitVarStmtStmt(VarStmt* stmt) = 0;
+    virtual any visitWhileStmt(While* stmt) = 0;
 };
 
 class Stmt
@@ -100,6 +102,19 @@ public:
 
     std::unique_ptr<Token> name;
     std::unique_ptr<Expr> initializer;
+};
+
+class While: public Stmt
+{
+public:
+    While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body): Stmt(), condition(std::move(condition)), body(std::move(body)) {}
+    ~While() override = default;
+
+    any accept(StmtVisitor* visitor) override
+    { return visitor->visitWhileStmt(this); }
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
 };
 
 }

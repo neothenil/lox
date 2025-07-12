@@ -244,6 +244,16 @@ any Interpreter::visitVarStmtStmt(VarStmt* stmt)
     return any();
 }
 
+any Interpreter::visitWhileStmt(While* stmt)
+{
+    auto predict = evaluate(stmt->condition.get());
+    while (isTruthy(&predict)) {
+        execute(stmt->body.get());
+        predict = evaluate(stmt->condition.get());
+    }
+    return any();
+}
+
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements)
 {
     try {

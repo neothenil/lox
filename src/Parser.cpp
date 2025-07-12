@@ -108,6 +108,7 @@ std::unique_ptr<Stmt> Parser::statement()
 {
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::PRINT})) return printStatement();
+    if (match({TokenType::WHILE})) return whileStatement();
     if (match({TokenType::LEFT_BRACE})) {
         return std::make_unique<Block>(block());
     }
@@ -135,6 +136,16 @@ std::unique_ptr<Stmt> Parser::printStatement()
     auto value = expression();
     consume(TokenType::SEMICOLON, "Expect ';' after print value.");
     return std::make_unique<Print>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::whileStatement()
+{
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
+    auto condition = expression();
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
+    auto body = statement();
+
+    return std::make_unique<While>(std::move(condition), std::move(body));
 }
 
 std::unique_ptr<vector<unique_ptr<Stmt>>> Parser::block()

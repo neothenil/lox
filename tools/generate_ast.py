@@ -122,7 +122,8 @@ def main():
         "Expression : Expr expr",
         "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "Print      : Expr expr",
-        "VarStmt    : Token name, Expr initializer"
+        "VarStmt    : Token name, Expr initializer",
+        "While      : Expr condition, Stmt body"
     ], ["autogen/Expr.h"])
 
 
