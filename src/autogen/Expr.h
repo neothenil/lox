@@ -15,6 +15,7 @@ using std::unique_ptr;
 class Expr;
 class Assign;
 class Binary;
+class Call;
 class Grouping;
 class Literal;
 class Logical;
@@ -28,6 +29,7 @@ public:
 
     virtual any visitAssignExpr(Assign* expr) = 0;
     virtual any visitBinaryExpr(Binary* expr) = 0;
+    virtual any visitCallExpr(Call* expr) = 0;
     virtual any visitGroupingExpr(Grouping* expr) = 0;
     virtual any visitLiteralExpr(Literal* expr) = 0;
     virtual any visitLogicalExpr(Logical* expr) = 0;
@@ -68,6 +70,20 @@ public:
     std::unique_ptr<Expr> left;
     std::unique_ptr<Token> op;
     std::unique_ptr<Expr> right;
+};
+
+class Call: public Expr
+{
+public:
+    Call(std::unique_ptr<Expr> callee, std::unique_ptr<Token> paren, std::unique_ptr<vector<unique_ptr<Expr>>> arguments): Expr(), callee(std::move(callee)), paren(std::move(paren)), arguments(std::move(arguments)) {}
+    ~Call() override = default;
+
+    any accept(ExprVisitor* visitor) override
+    { return visitor->visitCallExpr(this); }
+
+    std::unique_ptr<Expr> callee;
+    std::unique_ptr<Token> paren;
+    std::unique_ptr<vector<unique_ptr<Expr>>> arguments;
 };
 
 class Grouping: public Expr

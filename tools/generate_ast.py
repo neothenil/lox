@@ -111,6 +111,7 @@ def main():
     defineAst(outputDir, "Expr", [
         "Assign   : Token name, Expr value",
         "Binary   : Expr left, Token op, Expr right",
+        "Call     : Expr callee, Token paren, vector<unique_ptr<Expr>> arguments",
         "Grouping : Expr expression",
         "Literal  : Token value",
         "Logical  : Expr left, Token op, Expr right",

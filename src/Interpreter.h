@@ -24,6 +24,7 @@ public:
 
     any visitAssignExpr(Assign* expr) override;
     any visitBinaryExpr(Binary* expr) override;
+    any visitCallExpr(Call* expr) override;
     any visitGroupingExpr(Grouping* expr) override;
     any visitLiteralExpr(Literal* expr) override;
     any visitLogicalExpr(Logical* expr) override;

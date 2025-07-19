@@ -1,5 +1,6 @@
 #include "Interpreter.h"
 #include "Lox.h"
+#include "LoxCallable.h"
 #include <fmt/format.h>
 #include <cmath>
 
@@ -154,6 +155,30 @@ any Interpreter::visitBinaryExpr(Binary* expr)
     }
 
     return any();
+}
+
+any Interpreter::visitCallExpr(Call* expr)
+{
+    auto callee = evaluate(expr->callee.get());
+
+    std::vector<any> arguments;
+    arguments.reserve(expr->arguments->size());
+    for (const auto& argument : *expr->arguments) {
+        arguments.push_back(evaluate(argument.get()));
+    }
+
+    auto function = std::any_cast<LoxCallable>(&callee);
+    if (function == nullptr) {
+        throw RuntimeError(*expr->paren,
+            "Can only call functions and classes.");
+    }
+    if (arguments.size() != function->arity()) {
+        throw RuntimeError(*expr->paren, fmt::format(
+            "Expected {} arguments but got {}.",
+            function->arity(), arguments.size()
+        ));
+    }
+    return function->call(this, arguments);
 }
 
 any Interpreter::visitGroupingExpr(Grouping* expr)

@@ -64,7 +64,9 @@ private:
      * term           → factor ( ( "-" | "+" ) factor )* ;
      * factor         → unary ( ( "/" | "*" ) unary )* ;
      * unary          → ( "!" | "-" ) unary
-     *                | primary ;
+     *                | call ;
+     * call           → primary ( "(" arguments? ")" )* ;
+     * arguments      → expression ( "," expression )* ;
      * primary        → NUMBER | STRING | "true" | "false" | "nil"
      *                | "(" expression ")" | IDENTIFIER;
      * */
@@ -86,7 +88,10 @@ private:
     std::unique_ptr<Expr> term();
     std::unique_ptr<Expr> factor();
     std::unique_ptr<Expr> unary();
+    std::unique_ptr<Expr> call();
     std::unique_ptr<Expr> primary();
+
+    std::unique_ptr<Expr> finishCall(std::unique_ptr<Expr> callee);
 
     std::vector<Token> tokens;
     int current = 0;
