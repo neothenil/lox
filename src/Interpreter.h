@@ -4,6 +4,7 @@
 #include "autogen/Stmt.h"
 #include "Environment.h"
 #include <stdexcept>
+#include <map>
 
 namespace lox {
 
@@ -16,10 +17,12 @@ public:
     Token token;
 };
 
+class LoxCallable;
+
 class Interpreter: public ExprVisitor, public StmtVisitor
 {
 public:
-    Interpreter(): environment(std::make_unique<Environment>()) {}
+    Interpreter(): environment(std::make_unique<Environment>(globals())) {}
     ~Interpreter() override = default;
 
     any visitAssignExpr(Assign* expr) override;
@@ -40,6 +43,8 @@ public:
 
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 
+    static std::unique_ptr<Environment> globals();
+
 private:
     any evaluate(Expr* expr);
     void execute(Stmt* stmt);
@@ -52,6 +57,8 @@ private:
     std::string stringify(const any& obj);
 
     std::unique_ptr<Environment> environment;
+
+    static std::map<std::string, std::unique_ptr<LoxCallable>> nativeFuncs;
 };
 
 }

@@ -6,6 +6,8 @@
 
 namespace lox {
 
+std::map<std::string, std::unique_ptr<LoxCallable>> Interpreter::nativeFuncs;
+
 any Interpreter::evaluate(Expr* expr)
 {
     return expr->accept(this);
@@ -97,6 +99,9 @@ std::string Interpreter::stringify(const any& obj)
     if (auto ptr = std::any_cast<std::string>(&obj)) {
         return *ptr;
     }
+    if (auto ptr = std::any_cast<LoxCallable*>(&obj)) {
+        return "<native fn>";
+    }
     return std::string();
 }
 
@@ -167,11 +172,12 @@ any Interpreter::visitCallExpr(Call* expr)
         arguments.push_back(evaluate(argument.get()));
     }
 
-    auto function = std::any_cast<LoxCallable>(&callee);
-    if (function == nullptr) {
+    auto funcptr = std::any_cast<LoxCallable*>(&callee);
+    if (funcptr == nullptr || *funcptr == nullptr) {
         throw RuntimeError(*expr->paren,
             "Can only call functions and classes.");
     }
+    auto function = *funcptr;
     if (arguments.size() != function->arity()) {
         throw RuntimeError(*expr->paren, fmt::format(
             "Expected {} arguments but got {}.",
@@ -289,6 +295,16 @@ void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements)
     catch (const RuntimeError& error) {
         runtimeError(error);
     }
+}
+
+std::unique_ptr<Environment> Interpreter::globals()
+{
+    auto env = std::make_unique<Environment>();
+    if (nativeFuncs.find("clock") == nativeFuncs.end()) {
+        nativeFuncs["clock"] = std::make_unique<ClockCallable>();
+    }
+    env->define("clock", nativeFuncs["clock"].get());
+    return env;
 }
 
 }
