@@ -15,6 +15,7 @@ using std::unique_ptr;
 class Stmt;
 class Block;
 class Expression;
+class Function;
 class If;
 class Print;
 class VarStmt;
@@ -27,6 +28,7 @@ public:
 
     virtual any visitBlockStmt(Block* stmt) = 0;
     virtual any visitExpressionStmt(Expression* stmt) = 0;
+    virtual any visitFunctionStmt(Function* stmt) = 0;
     virtual any visitIfStmt(If* stmt) = 0;
     virtual any visitPrintStmt(Print* stmt) = 0;
     virtual any visitVarStmtStmt(VarStmt* stmt) = 0;
@@ -63,6 +65,20 @@ public:
     { return visitor->visitExpressionStmt(this); }
 
     std::unique_ptr<Expr> expr;
+};
+
+class Function: public Stmt
+{
+public:
+    Function(std::unique_ptr<Token> name, std::unique_ptr<vector<Token>> params, std::unique_ptr<vector<unique_ptr<Stmt>>> body): Stmt(), name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
+    ~Function() override = default;
+
+    any accept(StmtVisitor* visitor) override
+    { return visitor->visitFunctionStmt(this); }
+
+    std::unique_ptr<Token> name;
+    std::unique_ptr<vector<Token>> params;
+    std::unique_ptr<vector<unique_ptr<Stmt>>> body;
 };
 
 class If: public Stmt

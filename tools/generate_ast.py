@@ -121,6 +121,7 @@ def main():
     defineAst(outputDir, "Stmt", [
         "Block      : vector<unique_ptr<Stmt>> statements",
         "Expression : Expr expr",
+        "Function   : Token name, vector<Token> params, vector<unique_ptr<Stmt>> body",
         "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "Print      : Expr expr",
         "VarStmt    : Token name, Expr initializer",

@@ -6,7 +6,7 @@
 
 namespace lox {
 
-std::map<std::string, std::unique_ptr<LoxCallable>> Interpreter::nativeFuncs;
+std::map<std::string, std::unique_ptr<NativeCallable>> Interpreter::nativeFuncs;
 
 any Interpreter::evaluate(Expr* expr)
 {
@@ -22,9 +22,6 @@ void Interpreter::executeBlock(vector<unique_ptr<Stmt>>* statements)
 {
     assert(statements != nullptr);
 
-    environment = std::make_unique<Environment>(std::move(environment));
-    // make sure environment will be recovered even when exception is raised.
-    EnvironmentGuard guard(environment);
     for (auto& statement : *statements) {
         execute(statement.get());
     }
@@ -99,8 +96,11 @@ std::string Interpreter::stringify(const any& obj)
     if (auto ptr = std::any_cast<std::string>(&obj)) {
         return *ptr;
     }
-    if (auto ptr = std::any_cast<LoxCallable*>(&obj)) {
+    if (auto ptr = std::any_cast<NativeCallable*>(&obj)) {
         return "<native fn>";
+    }
+    if (auto ptr = std::any_cast<LoxFunction>(&obj)) {
+        return fmt::format("<fn {} >", ptr->declaration->name->lexeme);
     }
     return std::string();
 }
@@ -172,12 +172,19 @@ any Interpreter::visitCallExpr(Call* expr)
         arguments.push_back(evaluate(argument.get()));
     }
 
-    auto funcptr = std::any_cast<LoxCallable*>(&callee);
-    if (funcptr == nullptr || *funcptr == nullptr) {
+    auto nativeFuncPtr = std::any_cast<NativeCallable*>(&callee);
+    auto loxFuncPtr = std::any_cast<LoxFunction>(&callee);
+    LoxCallable* function = nullptr;
+    if (loxFuncPtr != nullptr) {
+        function = loxFuncPtr;
+    }
+    else if (nativeFuncPtr != nullptr && *nativeFuncPtr != nullptr) {
+        function = *nativeFuncPtr;
+    }
+    else {
         throw RuntimeError(*expr->paren,
             "Can only call functions and classes.");
     }
-    auto function = *funcptr;
     if (arguments.size() != function->arity()) {
         throw RuntimeError(*expr->paren, fmt::format(
             "Expected {} arguments but got {}.",
@@ -235,6 +242,9 @@ any Interpreter::visitVarExprExpr(VarExpr* expr)
 
 any Interpreter::visitBlockStmt(Block* stmt)
 {
+    environment = std::make_unique<Environment>(std::move(environment));
+    // make sure environment will be recovered even when exception is raised.
+    EnvironmentGuard guard(environment);
     executeBlock(stmt->statements.get());
     return any();
 }
@@ -242,6 +252,13 @@ any Interpreter::visitBlockStmt(Block* stmt)
 any Interpreter::visitExpressionStmt(Expression* stmt)
 {
     evaluate(stmt->expr.get());
+    return any();
+}
+
+any Interpreter::visitFunctionStmt(Function* stmt)
+{
+    LoxFunction function(stmt);
+    environment->define(stmt->name->lexeme, function);
     return any();
 }
 

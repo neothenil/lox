@@ -13,7 +13,10 @@ public:
     virtual any call(Interpreter* interpreter, std::vector<any>& arguments) = 0;
 };
 
-class ClockCallable: public LoxCallable
+class NativeCallable: public LoxCallable
+{};
+
+class ClockCallable: public NativeCallable
 {
 public:
     ~ClockCallable() override = default;
@@ -26,6 +29,22 @@ public:
             duration).count();
         return (double)millis / 1000.0;
     }
+};
+
+class LoxFunction: public LoxCallable
+{
+public:
+    explicit LoxFunction(Function* declaration)
+        : declaration(declaration) {}
+    ~LoxFunction() override = default;
+
+    int arity() override;
+    any call(Interpreter* interpreter, std::vector<any>& arguments) override;
+
+private:
+    Function* declaration;
+
+    friend class Interpreter;
 };
 
 }

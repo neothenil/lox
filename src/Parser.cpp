@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "Lox.h"
+#include <fmt/format.h>
 
 namespace lox {
 
@@ -81,6 +82,7 @@ void Parser::synchronize()
 std::unique_ptr<Stmt> Parser::declaration()
 {
     try {
+        if (match({TokenType::FUN})) return function("function");
         if (match({TokenType::VAR})) return varDeclaration();
         return statement();
     }
@@ -357,6 +359,31 @@ std::unique_ptr<Expr> Parser::call()
     }
 
     return expr;
+}
+
+std::unique_ptr<Function> Parser::function(const std::string& kind)
+{
+    auto name = std::make_unique<Token>(consume(TokenType::IDENTIFIER,
+        fmt::format("Expect {} name.", kind)));
+    consume(TokenType::LEFT_PAREN, fmt::format(
+        "Expect '(' after {} name.", kind));
+    auto parameters = std::make_unique<vector<Token>>();
+    if (!check(TokenType::RIGHT_PAREN)) {
+        do {
+            if (parameters->size() >= 255) {
+                error(peek(), "Can't have more than 255 parameters.");
+            }
+            parameters->push_back(consume(TokenType::IDENTIFIER,
+                "Expect parameter name."));
+        } while (match({TokenType::COMMA}));
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
+
+    consume(TokenType::LEFT_BRACE, fmt::format(
+        "Expect '{{' before {} body.", kind));
+    auto body = block();
+    return std::make_unique<Function>(std::move(name),
+        std::move(parameters), std::move(body));
 }
 
 std::unique_ptr<Expr> Parser::finishCall(std::unique_ptr<Expr> callee)

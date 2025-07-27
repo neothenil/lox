@@ -36,8 +36,12 @@ private:
 
     /* parsing functions for grammar:
      * program        → declaration* EOF ;
-     * declaration    → varDecl
+     * declaration    → funDecl
+     *                | varDecl
      *                | statement ;
+     * funDecl        → "fun" function ;
+     * function       → IDENTIFIER "(" parameters? ")" block ;
+     * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
      * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
      * statement      → exprStmt
      *                | forStmt
@@ -91,6 +95,7 @@ private:
     std::unique_ptr<Expr> call();
     std::unique_ptr<Expr> primary();
 
+    std::unique_ptr<Function> function(const std::string& kind);
     std::unique_ptr<Expr> finishCall(std::unique_ptr<Expr> callee);
 
     std::vector<Token> tokens;

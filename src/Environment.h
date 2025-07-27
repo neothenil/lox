@@ -35,4 +35,16 @@ private:
     std::unique_ptr<Environment>& env;
 };
 
+class EnvironmentSwapGuard
+{
+public:
+    EnvironmentSwapGuard(std::unique_ptr<Environment>& cur,
+        std::unique_ptr<Environment>& pre): cur(cur), pre(pre) {}
+    ~EnvironmentSwapGuard() { std::swap(cur, pre); }
+
+private:
+    std::unique_ptr<Environment>& cur;
+    std::unique_ptr<Environment>& pre;
+};
+
 }

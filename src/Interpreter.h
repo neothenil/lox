@@ -17,7 +17,8 @@ public:
     Token token;
 };
 
-class LoxCallable;
+class NativeCallable;
+class LoxFunction;
 
 class Interpreter: public ExprVisitor, public StmtVisitor
 {
@@ -36,6 +37,7 @@ public:
 
     any visitBlockStmt(Block* stmt) override;
     any visitExpressionStmt(Expression* stmt) override;
+    any visitFunctionStmt(Function* stmt) override;
     any visitIfStmt(If* stmt) override;
     any visitPrintStmt(Print* stmt) override;
     any visitVarStmtStmt(VarStmt* stmt) override;
@@ -58,7 +60,9 @@ private:
 
     std::unique_ptr<Environment> environment;
 
-    static std::map<std::string, std::unique_ptr<LoxCallable>> nativeFuncs;
+    static std::map<std::string, std::unique_ptr<NativeCallable>> nativeFuncs;
+
+    friend class LoxFunction;
 };
 
 }
