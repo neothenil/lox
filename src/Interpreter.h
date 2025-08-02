@@ -23,7 +23,7 @@ class LoxFunction;
 class Interpreter: public ExprVisitor, public StmtVisitor
 {
 public:
-    Interpreter(): environment(std::make_unique<Environment>(globals())) {}
+    Interpreter(): globals(make_globals()), environment(globals) {}
     ~Interpreter() override = default;
 
     any visitAssignExpr(Assign* expr) override;
@@ -45,7 +45,7 @@ public:
 
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 
-    static std::unique_ptr<Environment> globals();
+    static std::shared_ptr<Environment> make_globals();
 
 private:
     any evaluate(Expr* expr);
@@ -58,7 +58,10 @@ private:
         const any& left, const any& right);
     std::string stringify(const any& obj);
 
-    std::unique_ptr<Environment> environment;
+    // Use shared_ptr to support closure, even though this cound cause
+    // memory leakage. C++ doesn't have GC like JAVA.
+    std::shared_ptr<Environment> globals;
+    std::shared_ptr<Environment> environment;
 
     static std::map<std::string, std::unique_ptr<NativeCallable>> nativeFuncs;
 

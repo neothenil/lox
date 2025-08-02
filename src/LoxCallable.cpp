@@ -9,13 +9,12 @@ int LoxFunction::arity()
 
 any LoxFunction::call(Interpreter* interpreter, std::vector<any>& arguments)
 {
-    interpreter->environment = std::make_unique<Environment>(
-        std::move(interpreter->environment));
+    auto environment = std::make_shared<Environment>(interpreter->globals);
     for (int i = 0; i < declaration->params->size(); ++i) {
-        interpreter->environment->define(
-            declaration->params->at(i).lexeme, arguments.at(i));
+        environment->define(declaration->params->at(i).lexeme, arguments.at(i));
     }
-    EnvironmentGuard guard(interpreter->environment);
+    std::swap(environment, interpreter->environment);
+    EnvironmentSwapGuard guard(interpreter->environment, environment);
     interpreter->executeBlock(declaration->body.get());
     return any();
 }

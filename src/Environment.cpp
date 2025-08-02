@@ -37,9 +37,9 @@ void Environment::assign(const Token& name, const std::any& value)
         fmt::format("Undefined variable '{}'.", name.lexeme));
 }
 
-std::unique_ptr<Environment> Environment::pop()
+std::shared_ptr<Environment> Environment::pop()
 {
-    return std::move(enclosing);
+    return enclosing;
 }
 
 }

@@ -242,7 +242,7 @@ any Interpreter::visitVarExprExpr(VarExpr* expr)
 
 any Interpreter::visitBlockStmt(Block* stmt)
 {
-    environment = std::make_unique<Environment>(std::move(environment));
+    environment = std::make_shared<Environment>(environment);
     // make sure environment will be recovered even when exception is raised.
     EnvironmentGuard guard(environment);
     executeBlock(stmt->statements.get());
@@ -314,9 +314,9 @@ void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements)
     }
 }
 
-std::unique_ptr<Environment> Interpreter::globals()
+std::shared_ptr<Environment> Interpreter::make_globals()
 {
-    auto env = std::make_unique<Environment>();
+    auto env = std::make_shared<Environment>();
     if (nativeFuncs.find("clock") == nativeFuncs.end()) {
         nativeFuncs["clock"] = std::make_unique<ClockCallable>();
     }

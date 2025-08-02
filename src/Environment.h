@@ -12,39 +12,40 @@ class Environment
 {
 public:
     Environment() = default;
-    Environment(std::unique_ptr<Environment> enclosing):
-        enclosing(std::move(enclosing)) {}
+    Environment(std::shared_ptr<Environment> enclosing):
+        enclosing(enclosing) {}
 
     void define(const std::string& name, const std::any& value);
     std::any& get(const Token& name);
     void assign(const Token& name, const std::any& value);
-    std::unique_ptr<Environment> pop();
+    std::shared_ptr<Environment> pop();
 
 private:
     std::unordered_map<std::string, std::any> values;
-    std::unique_ptr<Environment> enclosing;
+    // memory leakage will occur.
+    std::shared_ptr<Environment> enclosing;
 };
 
 class EnvironmentGuard
 {
 public:
-    EnvironmentGuard(std::unique_ptr<Environment>& env): env(env) {}
+    EnvironmentGuard(std::shared_ptr<Environment>& env): env(env) {}
     ~EnvironmentGuard() { env = env->pop(); }
 
 private:
-    std::unique_ptr<Environment>& env;
+    std::shared_ptr<Environment>& env;
 };
 
 class EnvironmentSwapGuard
 {
 public:
-    EnvironmentSwapGuard(std::unique_ptr<Environment>& cur,
-        std::unique_ptr<Environment>& pre): cur(cur), pre(pre) {}
+    EnvironmentSwapGuard(std::shared_ptr<Environment>& cur,
+        std::shared_ptr<Environment>& pre): cur(cur), pre(pre) {}
     ~EnvironmentSwapGuard() { std::swap(cur, pre); }
 
 private:
-    std::unique_ptr<Environment>& cur;
-    std::unique_ptr<Environment>& pre;
+    std::shared_ptr<Environment>& cur;
+    std::shared_ptr<Environment>& pre;
 };
 
 }
