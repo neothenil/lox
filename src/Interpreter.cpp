@@ -281,6 +281,14 @@ any Interpreter::visitPrintStmt(Print* stmt)
     return any();
 }
 
+any Interpreter::visitReturnStmt(Return* stmt)
+{
+    any value;
+    if (stmt->value != nullptr) value = evaluate(stmt->value.get());
+
+    throw ReturnValue(value);
+}
+
 any Interpreter::visitVarStmtStmt(VarStmt* stmt)
 {
     any value(nullptr);

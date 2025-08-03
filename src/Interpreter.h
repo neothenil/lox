@@ -17,6 +17,14 @@ public:
     Token token;
 };
 
+class ReturnValue: public std::runtime_error
+{
+public:
+    ReturnValue(const any& value): std::runtime_error(""), value(value) {}
+
+    any value;
+};
+
 class NativeCallable;
 class LoxFunction;
 
@@ -40,6 +48,7 @@ public:
     any visitFunctionStmt(Function* stmt) override;
     any visitIfStmt(If* stmt) override;
     any visitPrintStmt(Print* stmt) override;
+    any visitReturnStmt(Return* stmt) override;
     any visitVarStmtStmt(VarStmt* stmt) override;
     any visitWhileStmt(While* stmt) override;
 

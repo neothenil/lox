@@ -15,7 +15,12 @@ any LoxFunction::call(Interpreter* interpreter, std::vector<any>& arguments)
     }
     std::swap(environment, interpreter->environment);
     EnvironmentSwapGuard guard(interpreter->environment, environment);
-    interpreter->executeBlock(declaration->body.get());
+    try {
+        interpreter->executeBlock(declaration->body.get());
+    }
+    catch (const ReturnValue& returnValue) {
+        return returnValue.value;
+    }
     return any();
 }
 

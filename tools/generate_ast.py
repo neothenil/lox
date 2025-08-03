@@ -124,6 +124,7 @@ def main():
         "Function   : Token name, vector<Token> params, vector<unique_ptr<Stmt>> body",
         "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "Print      : Expr expr",
+        "Return     : Token keyword, Expr value",
         "VarStmt    : Token name, Expr initializer",
         "While      : Expr condition, Stmt body"
     ], ["autogen/Expr.h"])
