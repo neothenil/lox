@@ -257,7 +257,7 @@ any Interpreter::visitExpressionStmt(Expression* stmt)
 
 any Interpreter::visitFunctionStmt(Function* stmt)
 {
-    LoxFunction function(stmt);
+    LoxFunction function(stmt, environment);
     environment->define(stmt->name->lexeme, function);
     return any();
 }

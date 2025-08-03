@@ -34,8 +34,9 @@ public:
 class LoxFunction: public LoxCallable
 {
 public:
-    explicit LoxFunction(Function* declaration)
-        : declaration(declaration) {}
+    explicit LoxFunction(Function* declaration,
+        std::shared_ptr<Environment> closure)
+        : declaration(declaration), closure(closure) {}
     ~LoxFunction() override = default;
 
     int arity() override;
@@ -43,6 +44,7 @@ public:
 
 private:
     Function* declaration;
+    std::shared_ptr<Environment> closure;
 
     friend class Interpreter;
 };

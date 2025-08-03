@@ -9,7 +9,7 @@ int LoxFunction::arity()
 
 any LoxFunction::call(Interpreter* interpreter, std::vector<any>& arguments)
 {
-    auto environment = std::make_shared<Environment>(interpreter->globals);
+    auto environment = std::make_shared<Environment>(closure);
     for (int i = 0; i < declaration->params->size(); ++i) {
         environment->define(declaration->params->at(i).lexeme, arguments.at(i));
     }
