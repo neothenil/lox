@@ -17,8 +17,11 @@ public:
 
     void define(const std::string& name, const std::any& value);
     std::any& get(const Token& name);
+    std::any& getAt(int distance, const std::string& name);
     void assign(const Token& name, const std::any& value);
+    void assignAt(int distance, const Token& name, const std::any& value);
     std::shared_ptr<Environment> pop();
+    Environment* ancestor(int distance);
 
 private:
     std::unordered_map<std::string, std::any> values;

@@ -108,7 +108,14 @@ std::string Interpreter::stringify(const any& obj)
 any Interpreter::visitAssignExpr(Assign* expr)
 {
     auto value = evaluate(expr->value.get());
-    environment->assign(*expr->name, value);
+    auto iter = locals.find(expr);
+    if (iter != locals.end()) {
+        int distance = iter->second;
+        environment->assignAt(distance, *expr->name, value);
+    }
+    else {
+        globals->assign(*expr->name, value);
+    }
     return value;
 }
 
@@ -237,7 +244,19 @@ any Interpreter::visitUnaryExpr(Unary* expr)
 
 any Interpreter::visitVarExprExpr(VarExpr* expr)
 {
-    return environment->get(*expr->name);
+    return lookUpVariable(*expr->name, expr);
+}
+
+any Interpreter::lookUpVariable(const Token& name, Expr* expr)
+{
+    auto iter = locals.find(expr);
+    if (iter != locals.end()) {
+        int distance = iter->second;
+        return environment->getAt(distance, name.lexeme);
+    }
+    else {
+        return globals->get(name);
+    }
 }
 
 any Interpreter::visitBlockStmt(Block* stmt)

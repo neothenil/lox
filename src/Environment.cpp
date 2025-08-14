@@ -21,6 +21,20 @@ std::any& Environment::get(const Token& name)
         fmt::format("Undefined variable '{}'.", name.lexeme));
 }
 
+std::any& Environment::getAt(int distance, const std::string& name)
+{
+    return ancestor(distance)->values[name];
+}
+
+Environment* Environment::ancestor(int distance)
+{
+    auto env = this;
+    for (int i = 0; i < distance; ++i) {
+        env = env->enclosing.get();
+    }
+    return env;
+}
+
 void Environment::assign(const Token& name, const std::any& value)
 {
     if (values.find(name.lexeme) != values.end()) {
@@ -35,6 +49,12 @@ void Environment::assign(const Token& name, const std::any& value)
 
     throw RuntimeError(name,
         fmt::format("Undefined variable '{}'.", name.lexeme));
+}
+
+void Environment::assignAt(int distance,
+    const Token& name, const std::any& value)
+{
+    ancestor(distance)->values[name.lexeme] = value;
 }
 
 std::shared_ptr<Environment> Environment::pop()

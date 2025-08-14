@@ -2,6 +2,7 @@
 #include "Parser.h"
 #include "AstPrinter.h"
 #include "Interpreter.h"
+#include "Resolver.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -26,6 +27,10 @@ void run(const std::string& source)
     if (interpreter.get() == nullptr) {
         interpreter = std::make_unique<Interpreter>();
     }
+
+    Resolver resolver(interpreter.get());
+    resolver.resolve(statements);
+
     interpreter->interpret(statements);
 }
 

@@ -54,6 +54,9 @@ public:
 
     void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
 
+    void resolve(Expr* expr, int depth)
+    { locals[expr] = depth; }
+
     static std::shared_ptr<Environment> make_globals();
 
 private:
@@ -67,10 +70,13 @@ private:
         const any& left, const any& right);
     std::string stringify(const any& obj);
 
+    any lookUpVariable(const Token& name, Expr* expr);
+
     // Use shared_ptr to support closure, even though this cound cause
     // memory leakage. C++ doesn't have GC like JAVA.
     std::shared_ptr<Environment> globals;
     std::shared_ptr<Environment> environment;
+    std::unordered_map<Expr*, int> locals;
 
     static std::map<std::string, std::unique_ptr<NativeCallable>> nativeFuncs;
 
