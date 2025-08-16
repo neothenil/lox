@@ -30,6 +30,8 @@ void run(const std::string& source)
 
     Resolver resolver(interpreter.get());
     resolver.resolve(statements);
+    // Stop if there was a resolution error.
+    if (hadError) return;
 
     interpreter->interpret(statements);
 }

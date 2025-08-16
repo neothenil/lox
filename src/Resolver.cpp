@@ -60,6 +60,9 @@ void Resolver::declare(Token& name)
     if (scopes.empty()) return;
 
     auto& scope = scopes.back();
+    if (scope.find(name.lexeme) != scope.end()) {
+        error(name, "Already a variable with this name in this scope.");
+    }
     scope[name.lexeme] = false;
 }
 
@@ -132,7 +135,7 @@ any Resolver::visitFunctionStmt(Function* stmt)
     declare(*stmt->name);
     define(*stmt->name);
 
-    resolveFunction(stmt);
+    resolveFunction(stmt, FUNCTION);
     return any();
 }
 
@@ -154,8 +157,11 @@ any Resolver::visitUnaryExpr(Unary* expr)
     return any();
 }
 
-void Resolver::resolveFunction(Function* function)
+void Resolver::resolveFunction(Function* function, FunctionType type)
 {
+    auto enclosingFunction = currentFunction;
+    currentFunction = type;
+
     beginScope();
     for (auto& param : *function->params) {
         declare(param);
@@ -163,6 +169,8 @@ void Resolver::resolveFunction(Function* function)
     }
     resolve(*function->body);
     endScope();
+
+    currentFunction = enclosingFunction;
 }
 
 any Resolver::visitIfStmt(If* stmt)
@@ -183,6 +191,9 @@ any Resolver::visitPrintStmt(Print* stmt)
 
 any Resolver::visitReturnStmt(Return* stmt)
 {
+    if (currentFunction == NONE) {
+        error(*stmt->keyword, "Can't return from top-level code.");
+    }
     if (stmt->value != nullptr) {
         resolve(stmt->value.get());
     }

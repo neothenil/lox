@@ -12,6 +12,8 @@ class Interpreter;
 
 class Resolver: public ExprVisitor, public StmtVisitor
 {
+    enum FunctionType {NONE, FUNCTION};
+
 public:
     explicit Resolver(Interpreter* interpreter): interpreter(interpreter) {}
     ~Resolver() override = default;
@@ -44,11 +46,12 @@ private:
     void declare(Token& name);
     void define(Token& name);
     void resolveLocal(Expr* expr, Token& name);
-    void resolveFunction(Function* function);
+    void resolveFunction(Function* function, FunctionType type);
 
 private:
     Interpreter* interpreter = nullptr;
     std::vector<std::unordered_map<std::string, bool>> scopes;
+    FunctionType currentFunction = NONE;
 };
 
 }
